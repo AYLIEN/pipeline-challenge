@@ -1,0 +1,128 @@
+info:
+  contact:
+    email: eng-team@aylien.com
+    name: API Engineering Team
+    url: https://aylien.com
+  
+  title: AYLIEN Challenge Messages API
+  version: "1.0"
+
+openapi: 3.0.1
+servers:
+  - url: http://localhost:5000
+paths:
+  /messages:
+    get:
+      description: Get a list of messages.
+      parameters:
+        - name: max_messages
+          in: query
+          required: true
+          schema:
+            minimum: 1
+            format: int32
+            nullable: false
+            type: integer
+          description: Maximum number of messages to receive.
+      responses:
+        "200":
+          description: An object with a list of messages inside
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Messages"
+
+  /ack:
+    post:
+      description: Acknowledge a set of message IDs.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: integer
+              type: array
+      responses:
+        "200":
+          description: An object with a status and list of IDs considered dead in the request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcknowledgeResponse"
+
+  /metrics:
+    get:
+      description: Latency and dead message metrics
+    responses:
+      "200":
+        description: A set of metrics and a count of dead messages
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Metrics"
+
+        "unit": "milliseconds",
+        "dead": len(dead),
+        "latency_average": np.average(latencies),
+        "latency_p90": np.percentile(latencies, 90),
+        "latency_p99": np.percentile(latencies, 99),
+        "latency_p50": np.percentile(latencies, 50),
+        "latency_min": min(latencies),
+        "latency_max": max(latencies),
+components:
+  schemas:
+    Metrics:
+      properties:
+        unit:
+          type: string
+        dead:
+          type: integer
+        latency_average:
+          type: float
+        latency_p90:
+          type: float
+        latency_p99:
+          type: float
+        latency_p50:
+          type: float
+        latency_min:
+          type: float
+        latency_max:
+          type: float
+    Messages:
+      properties:
+        messages:
+          description: An array of messages
+          items:
+            $ref: "#/components/schemas/Message"
+          type: array
+      type: object
+    Message:
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        social_share_counts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SocialSharesCount"
+    AcknowledgeResponse:
+      properties:
+        status:
+          type: string
+        dead:
+          type: array
+          items:
+            type: integer
+    SocialSharesCount:
+      properties:
+        network:
+          type: string
+        count:
+          type: integer
+      type: object
