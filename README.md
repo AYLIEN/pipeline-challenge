@@ -6,10 +6,21 @@ Wish you all the best and good luck!
 
 # Challenge
 
-We are looking to design a high-throughput data pipeline which pulls messages from an HTTP endpoint and indexes them in Elasticsearch for further searching. The HTTP endpoint for pulling messages is provided, as well as the tools necessary (Elasticsearch + Kibana). You do not need to provide an API to search over elasticsearch, the pipeline is enough and we will be looking at the data directly, but you should consider how to effectively index the documents so that they can be searched. After receiving messages and indexing them, you have to "acknowledge" those requests by sending a request to the Messages API with the message ID that has been processed successfully. The messages API provides metrics on the time it took to process each message.
+We are looking to design a high-throughput data pipeline which pulls messages from an HTTP endpoint, transforms them, and sends them for processing to another endpoint. In the end, the service will acknowledge successful processing of each message. The HTTP endpoint for pulling messages, processing them and acknowledging them are provided, as well as a metrics endpoint so you can see how your pipeline is doing. More details on the API is provided below, and you can find the specification in `messages-openapi.yaml`.
 
+The language or framework you work with is up to you entirely. Please provide instructions for running your project.
 
-The language or framework your work with is up to you entirely. Please provide instructions for running your project. We will run it along the messages API so we can see your pipeline processing messages and the latency metrics.
+In short, these are the steps you need to implement:
+1. Pull messages
+2. Transform them in a way that is digestable by the `/process` endpoint (example request below)
+  - Concatenate title and body into `text`
+  - Count characters and words into `characters_count` and `words_count` respectively
+  - Flatten social share counts for each network and sum them up (`facebook_shares: 123`, `twitter_shares: 50`, `reddit_shares: 5` and `sum_shares: 178`)
+3. Send them for processing
+  - In case of a failure, retry them
+4. Acknowledge successfully processed messages
+
+There is no "strict" validation of your transformed messages, we mostly care about how you will integrate such transformation into your code.
 
 # Tools
 
@@ -19,21 +30,9 @@ There are a set of tools already prepared for you to work with for this task. Yo
 docker-compose up
 ```
 
-## Elasticsearch & Kibana
-
-Documents will be indexed in Elasticsearch. The instance is accessible at `localhost:9200` after running docker-compose. Kibana is a dashboard on top of Elasticsearch that helps you with interacting with the instance through a graphical user interface. You do not have to use Kibana but it is there to make it easier for you to debug and troubleshoot. Kibana is accessible at `localhost:5601`.
-
-Useful resources:
-
-- [Elasticsearch Clients Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html)
-- [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html)
-- [Elasticsearch REST API reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html)
-
-You will be mostly working with the [Document APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html), and maybe [Index APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html). For troubleshooting you may find the [cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) useful. You can use all of these APIs from the Kibana dashboard's Dev Tools section (look for the wrench icon on the sidebar).
-
 ## Messages API
 
-This is a simple HTTP endpoint which you can pull messages from available at `localhost:5000`. The API schema is specified in `messages-openapi.yaml` using OpenAPI specification format.
+This is a simple HTTP endpoint which you can pull messages from, acknowledge messages and send items for processing to; available at `localhost:5000`. The API schema is specified in `messages-openapi.yaml` using OpenAPI specification format.
 
 To receive a maximum of `10` messages at any time, send this request:
 
@@ -42,16 +41,31 @@ curl http://localhost:5000/messages?max_messages=10
 ```
 
 The number of messages returned will be less than or equal to `10` in this case. You may receive an empty array if no messages are available.
-
 The `max_messages` parameter is mandatory and must be provided. For more information on the schema of requests and response see `messages-openapi.yaml`.
 
-To acknowledge messages:
+To send an item for processing:
+
+```
+curl -XPOST http://localhost:5000/process -H 'Content-Type: application/json' -d '[{
+  "text": "title + body here",
+  "words_count": 123,
+  "characters_count": 500,
+  "keywords": ["as", "they", "were"],
+  "facebook_shares": 123,
+  "twitter_shares": 50,
+  "reddit_shares": 5,
+  "sum_shares": 178
+}]'
+```
+Processing items takes a while depending on the batch size (number of items in the array you provide). This time grows logarithmically with batch size. Processing may fail for a batch as a whole.
+
+After an item has been processed **successfully**, you should acknowledge that the message has been processed by sending the IDs you received from `/messages` endpoint to `/ack`:
 
 ```
 curl -XPOST http://localhost:5000/ack -H 'Content-Type: application/json' -d "[1, 2, 3]"
 ```
 
-A message has up to a minute to be acknowledged, after that the message is considered "dead". Dead messages do not show up in latency results but instead show up in the "dead" count.
+A message has up to a minute to be acknowledged, after that the message is considered "dead". Dead messages do not show up in latency results but instead show up in the "dead" count. The response from `/ack` will include a list of dead messages IDs.
 
 To see metrics:
 
