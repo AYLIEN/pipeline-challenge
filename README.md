@@ -13,11 +13,11 @@ The language or framework you work with is up to you entirely. Please provide in
 In short, these are the steps you need to implement:
 1. Pull messages
 2. Transform them in a way that is digestable by the `/process` endpoint (example request below)
-  - Concatenate title and body into `text`
-  - Count characters and words into `characters_count` and `words_count` respectively
-  - Flatten social share counts for each network and sum them up (`facebook_shares: 123`, `twitter_shares: 50`, `reddit_shares: 5` and `sum_shares: 178`)
+    - Concatenate title and body into `text`
+    - Count characters and words into `characters_count` and `words_count` respectively
+    - Flatten social share counts for each network and sum them up (`facebook_shares: 123`, `twitter_shares: 50`, `reddit_shares: 5` and `sum_shares: 178`)
 3. Send them for processing
-  - In case of a failure, retry them
+    - In case of a failure, retry them
 4. Acknowledge successfully processed messages
 
 There is no "strict" validation of your transformed messages, we mostly care about how you will integrate such transformation into your code.
@@ -40,7 +40,7 @@ To receive a maximum of `10` messages at any time, send this request:
 curl http://localhost:5000/messages?max_messages=10
 ```
 
-The number of messages returned will be less than or equal to `10` in this case. You may receive an empty array if no messages are available.
+The number of messages returned will be less than or equal to 10 in this case. You may receive an empty array if no messages are available.
 The `max_messages` parameter is mandatory and must be provided. For more information on the schema of requests and response see `messages-openapi.yaml`.
 
 To send an item for processing:
