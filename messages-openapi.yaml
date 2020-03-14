@@ -113,6 +113,8 @@ components:
       type: object
     Message:
       properties:
+        id:
+          type: integer
         title:
           type: string
         body:
@@ -150,6 +152,8 @@ components:
     ProcessItem:
       type: object
       properties:
+        id:
+          type: integer
         text:
           type: string
         words_count:
