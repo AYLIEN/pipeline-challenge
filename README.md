@@ -4,6 +4,8 @@ Hello, thank you for taking this challenge. The goal here is to get a sense of y
 
 Wish you all the best and good luck!
 
+Note: This repository is archived to avoid pull-requests, since pull-requests will be public. Please zip your folder and send it over to your correspondence at AYLIEN instead.
+
 # Challenge
 
 We are looking to design a high-throughput data pipeline which pulls messages from an HTTP endpoint, transforms them, and sends them for processing to another endpoint. In the end, the service will acknowledge successful processing of each message. The HTTP endpoint for pulling messages, processing them and acknowledging them are provided, as well as a metrics endpoint so you can see how your pipeline is doing. More details on the API is provided below, and you can find the specification in `messages-openapi.yaml`.
