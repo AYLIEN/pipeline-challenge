@@ -8,7 +8,7 @@ Note: This repository is archived to avoid pull-requests, since pull-requests wi
 
 # Challenge
 
-We are looking to design a high-throughput data pipeline which pulls messages from an HTTP endpoint, transforms them, and sends them for processing to another endpoint. In the end, the service will acknowledge successful processing of each message. The HTTP endpoint for pulling messages, processing them and acknowledging them are provided, as well as a metrics endpoint so you can see how your pipeline is doing. More details on the API is provided below, and you can find the specification in `messages-openapi.yaml`.
+We are looking to design a high-throughput data streaming pipeline which pulls messages from an HTTP endpoint, transforms them, and sends them for processing to another endpoint. In the end, the service will acknowledge successful processing of each message. The HTTP endpoint for pulling messages, processing them and acknowledging them are provided, as well as a metrics endpoint so you can see how your pipeline is doing. More details on the API is provided below, and you can find the specification in `messages-openapi.yaml`.
 
 The language or framework you work with is up to you entirely. Please provide instructions for running your project.
 
@@ -23,6 +23,8 @@ In short, these are the steps you need to implement:
 4. Acknowledge successfully processed messages
 
 There is no "strict" validation of your transformed messages, we mostly care about how you will integrate such transformation into your code.
+
+Please note that we expect a streaming pipeline that can run indefinitely and process as many requests as possible in fixed units of time.
 
 # Tools
 
