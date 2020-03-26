@@ -24,7 +24,7 @@ In short, these are the steps you need to implement:
 
 There is no "strict" validation of your transformed messages, we mostly care about how you will integrate such transformation into your code.
 
-Please note that we expect a streaming pipeline that can run indefinitely and process as many requests as possible in fixed units of time.
+Please note that we expect a streaming pipeline that can run indefinitely and process as many requests as possible until stopped.
 
 # Tools
 
