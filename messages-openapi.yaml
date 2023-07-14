@@ -1,10 +1,5 @@
 info:
-  contact:
-    email: eng-team@aylien.com
-    name: API Engineering Team
-    url: https://aylien.com
-  
-  title: AYLIEN Challenge Messages API
+  title: Pipeline Challenge - Messages API
   version: "1.0"
 
 openapi: 3.0.1
